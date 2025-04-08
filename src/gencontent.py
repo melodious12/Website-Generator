@@ -4,6 +4,11 @@ from blocktype import markdown_to_html_node
 
 
 def generate_page(from_path, template_path, dest_path, basepath):
+    if not basepath.startswith('/'):
+        basepath = '/' + basepath
+    if not basepath.endswith('/'):
+        basepath = basepath + '/'
+
     print(f" * {from_path} {template_path} -> {dest_path}")
     from_file = open(from_path, "r")
     markdown_content = from_file.read()
@@ -20,12 +25,14 @@ def generate_page(from_path, template_path, dest_path, basepath):
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", html)
 
-    template = template.replace('href="/', f'href="{basepath}')
-    template = template.replace('src="/', f'src="{basepath}')
-    template = template.replace('action="/', f'action="{basepath}')
+    template = template.replace('href="/', f'href="{basepath}[:-1]')
+    template = template.replace('src="/', f'src="{basepath}[:-1]')
+    template = template.replace('action="/', f'action="{basepath}[:-1]')
 
     template = re.sub(r'href="(?!\/|http)([^"]*)"', f'href="{basepath}\\1"', template)
     template = re.sub(r'src="(?!\/|http)([^"]*)"', f'src="{basepath}\\1"', template)
+
+    template += f"\n<!-- Generated with basepath: {basepath} -->"
 
     dest_dir_path = os.path.dirname(dest_path)
     if dest_dir_path != "":
