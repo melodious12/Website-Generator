@@ -1,4 +1,5 @@
 import os
+import re
 from blocktype import markdown_to_html_node
 
 
@@ -22,6 +23,9 @@ def generate_page(from_path, template_path, dest_path, basepath):
     template = template.replace('href="/', f'href="{basepath}')
     template = template.replace('src="/', f'src="{basepath}')
     template = template.replace('action="/', f'action="{basepath}')
+
+    template = re.sub(r'href="(?!\/|http)([^"]*)"', f'href="{basepath}\\1"', template)
+    template = re.sub(r'src="(?!\/|http)([^"]*)"', f'src="{basepath}\\1"', template)
 
     dest_dir_path = os.path.dirname(dest_path)
     if dest_dir_path != "":
